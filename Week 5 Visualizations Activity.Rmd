@@ -1,0 +1,56 @@
+install.packages("bslib")
+install.packages("tidyverse")
+install.packages("knitr")
+---
+title: "Week 5 Visualizations Activity"
+author: "Hao Li"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+###SET UP
+```{r setup, include=FALSE}
+library(package='dplyr')
+library(package='knitr')
+library(bslib)
+library(tidyverse)
+
+```
+
+###INPUT DATA
+```{r, include=TRUE}
+library(foreign)
+XPT<-read.xport("C:/Users/12052/Downloads/adae.XPT")
+write.csv(XPT,"C:/Users/12052/Downloads/adae.csv")
+adae<-read.csv("C:/Users/12052/Downloads/adae.csv")
+```
+
+###FILTER
+```{r, include=TRUE}
+adae2<-adae %>% 
+select(USUBJID,TRTA, SEX, AGE, RACE, TRTSDT,TRTEDT, AESEV)%>%
+rename(gender=SEX)
+```
+
+###graph
+```{r, echo = TRUE}
+adae2 %>%
+  ggplot(aes(fct_infreq(AESEV)%>%fct_rev()))+geom_bar()+
+  coord_flip()+labs(x="Serious adverse event")
+````
+
+###In this bar chart, I checked the count of serious adverse event.Based on the table, most of adverse events are on mild level, more than 750 cases, and only less than 50 cases are serious adverse events. 
+
+
+###scatter
+```{r, echo = TRUE}
+adae2 %>% select(AGE, TRTSDT) %>% 
+  ggplot(aes(x=AGE, y=TRTSDT)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se=TRUE, fullrange=FALSE, level=0.95)+
+  ggtitle("Adverse events start date vs Age") +
+  xlab("AGE") + 
+  ylab("Adverse events start date")
+````
+
+###I checked the relationship between age and adverse events start date.Based on the scatter plot, we can conclude that age is not a factor that would affect the adverse events start date in this study.
